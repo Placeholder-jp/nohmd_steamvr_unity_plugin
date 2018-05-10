@@ -56,12 +56,19 @@ public class SteamVR : System.IDisposable
 		}
 	}
 
-	public static bool usingNativeSupport
+#if NO_REQUIRED_HMD
+    public static bool usingNativeSupport
+	{
+		get { return true; }
+	}
+#else
+    public static bool usingNativeSupport
 	{
 		get { return UnityEngine.XR.XRDevice.GetNativePtr() != System.IntPtr.Zero; }
 	}
+#endif
 
-	static SteamVR CreateInstance()
+    static SteamVR CreateInstance()
 	{
 		try
 		{
@@ -146,9 +153,8 @@ public class SteamVR : System.IDisposable
 	public string hmd_SerialNumber { get { return GetStringProperty(ETrackedDeviceProperty.Prop_SerialNumber_String); } }
 
 	public float hmd_SecondsFromVsyncToPhotons { get { return GetFloatProperty(ETrackedDeviceProperty.Prop_SecondsFromVsyncToPhotons_Float); } }
-	public float hmd_DisplayFrequency { get { return GetFloatProperty(ETrackedDeviceProperty.Prop_DisplayFrequency_Float); } }
-
-	public string GetTrackedDeviceString(uint deviceId)
+    public float hmd_DisplayFrequency { get { return GetFloatProperty(ETrackedDeviceProperty.Prop_DisplayFrequency_Float); } }
+    public string GetTrackedDeviceString(uint deviceId)
 	{
 		var error = ETrackedPropertyError.TrackedProp_Success;
 		var capacity = hmd.GetStringTrackedDeviceProperty(deviceId, ETrackedDeviceProperty.Prop_AttachedDeviceId_String, null, 0, ref error);
@@ -180,7 +186,7 @@ public class SteamVR : System.IDisposable
 		return hmd.GetFloatTrackedDeviceProperty(deviceId, prop, ref error);
 	}
 
-	#region Event callbacks
+#region Event callbacks
 
 	private void OnInitializing(bool initializing)
 	{
@@ -245,7 +251,7 @@ public class SteamVR : System.IDisposable
 		}
 	}
 
-	#endregion
+#endregion
 
 	private SteamVR()
 	{
