@@ -87,8 +87,10 @@ public class SteamVR_RenderModel : MonoBehaviour
 					_instance = OpenVR.RenderModels;
 					if (_instance == null)
 					{
-						Debug.LogError("Failed to load IVRRenderModels interface version " + OpenVR.IVRRenderModels_Version);
-						failedLoadInterface = true;
+#if !NO_REQUIRED_HMD
+                        Debug.LogError("Failed to load IVRRenderModels interface version " + OpenVR.IVRRenderModels_Version);
+#endif
+                        failedLoadInterface = true;
                     }
 				}
 				return _instance;
