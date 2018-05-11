@@ -9,13 +9,6 @@ using UnityEditor;
 
 public class SteamVR_Preferences
 {
-#if NO_REQUIRED_HMD
-	public static bool AutoEnableVR
-	{
-		get { return true; }
-		set {}
-	}
-#else
     /// <summary>
     /// Should SteamVR automatically enable VR when opening Unity or pressing play.
     /// </summary>
@@ -30,7 +23,6 @@ public class SteamVR_Preferences
 			EditorPrefs.SetBool("SteamVR_AutoEnableVR", value);
 		}
 	}
-#endif
 
     [PreferenceItem("SteamVR")]
 	static void PreferencesGUI()
