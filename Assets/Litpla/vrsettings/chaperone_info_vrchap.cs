@@ -6,7 +6,7 @@ namespace Litpla.VR.Util
     [Serializable]
     public class chaperone_info_vrchap
     {
-        public string jsonid;
+        public string jsonid = "chaperone_info";
         public List<Universe> universes;
         public int version;
 

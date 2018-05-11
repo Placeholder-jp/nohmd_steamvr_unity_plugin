@@ -48,21 +48,11 @@ namespace Litpla.VR.Util
             EditorGUILayout.BeginVertical();
             EditorGUILayout.Space();
             {
-                if (GUILayout.Button("ReadSteamVRSettings"))
+                if (util.IsRestarting)
                 {
-                    var newSettings = new steamvr_vrsettings();
-                    var json = JsonUtility.ToJson(newSettings);
-                    Debug.Log(json);
+                    EditorGUILayout.HelpBox("Restarting SteamVR...", MessageType.Info);
                 }
-
-                if (GUILayout.Button("ReadDriver"))
-                {
-                    var newDriver = new default_vrsettings();
-                    var json = JsonUtility.ToJson(newDriver);
-                    Debug.Log(json);
-                }
-
-                if (EditorApplication.isCompiling)
+                else if (EditorApplication.isCompiling)
                 {
                     EditorGUILayout.HelpBox("Recompiling...", MessageType.Info);
                 }
@@ -71,9 +61,15 @@ namespace Litpla.VR.Util
                     var title = "No Require HMD connection";
                     var toggle = EditorGUILayout.Toggle(new GUIContent(title), IsNoRequiredHMD);
                     if (IsNoRequiredHMD && !toggle)
+                    {
                         RemoveDefineSymbol(NO_REQUIRED_HMD);
+                        util.DeactivateNoRequiredHMDSettings();
+                    }
                     else if (!IsNoRequiredHMD && toggle)
+                    {
                         AddDefineSymbol(NO_REQUIRED_HMD);
+                        util.ActivateNoRequiredHMDSettings();
+                    }
                     EditorGUILayout.HelpBox("HMD及びリンクボックスの接続を必要としない場合はTrueに", MessageType.Info);
                 }
             }
