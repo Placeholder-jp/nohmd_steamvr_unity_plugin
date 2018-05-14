@@ -5,7 +5,7 @@ namespace Litpla.VR.Util
     [Serializable]
     public class default_vrsettings
     {
-        public DriverNull driver_null;
+        public DriverNull driver_null = new DriverNull();
 
         [Serializable]
         public class DriverNull

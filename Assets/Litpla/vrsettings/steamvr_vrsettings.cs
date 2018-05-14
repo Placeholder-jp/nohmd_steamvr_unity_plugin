@@ -5,14 +5,14 @@ namespace Litpla.VR.Util
     [Serializable]
     public class steamvr_vrsettings
     {
-        public Dashboard dashboard;
-        public Steamvr steamvr;
-        public Userinterface userinterface;
+        public Dashboard dashboard = new Dashboard();
+        public Steamvr steamvr = new Steamvr();
+        public Userinterface userinterface = new Userinterface();
 
         [Serializable]
         public class Dashboard
         {
-            public bool enableDashboard;
+            public bool enableDashboard = false;
         }
 
         [Serializable]

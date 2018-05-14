@@ -27,18 +27,6 @@ namespace Litpla.VR.Util
             return data;
         }
 
-        private static chaperone_info_vrchap ReadChaperone_Info_VRChap()
-        {
-            var data = new chaperone_info_vrchap();
-            var path = Emviroment.Path.chaperone_info_vrchap_path;
-            if (File.Exists(path))
-            {
-                var fileJson = File.ReadAllText(path);
-                JsonUtility.FromJsonOverwrite(fileJson, data);
-            }
-            return data;
-        }
-
         private static default_vrsettings ReadDefault_VRSettings()
         {
             var data = new default_vrsettings();
@@ -59,18 +47,19 @@ namespace Litpla.VR.Util
             File.WriteAllText(path, json);
         }
 
-        private static void WriteChaperone_Info_VRChap(chaperone_info_vrchap data)
-        {
-            var json = JsonUtility.ToJson(data, true);
-            var path = Emviroment.Path.chaperone_info_vrchap_path;
-            File.WriteAllText(path, json);
-        }
-
         private static void WriteDefault_VRSettings(default_vrsettings data)
         {
             var json = JsonUtility.ToJson(data, true);
             var path = Emviroment.Path.default_vrsettings;
             File.WriteAllText(path, json);
+        }
+
+        public static void DeleteChaperone_Info()
+        {
+            if (File.Exists(Emviroment.Path.chaperone_info_vrchap_path))
+            {
+                File.Delete(Emviroment.Path.chaperone_info_vrchap_path);
+            }
         }
 
         /// <summary>
@@ -89,9 +78,6 @@ namespace Litpla.VR.Util
             d.driver_null.enable = true;
             d.driver_null.displayFrequency = displayFrequency;
             WriteDefault_VRSettings(d);
-
-            var c = ReadChaperone_Info_VRChap();
-            WriteChaperone_Info_VRChap(c);
 
             RestartSteamVR();
         }
