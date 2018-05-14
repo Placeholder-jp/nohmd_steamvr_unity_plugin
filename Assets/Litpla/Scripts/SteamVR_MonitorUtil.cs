@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using Microsoft.Win32;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
@@ -42,7 +43,6 @@ namespace Litpla.VR.Util
         private static void WriteSteamVR_VRSettings(steamvr_vrsettings data)
         {
             var json = JsonUtility.ToJson(data, true);
-            Debug.Log(json);
             var path = Emviroment.Path.steamvr_vrsettings;
             File.WriteAllText(path, json);
         }
@@ -154,15 +154,17 @@ namespace Litpla.VR.Util
                     get
                     {
                         var path = string.Empty;
-#if NET_4_6
-                path = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
-                path += "(x86)";
-#else
-                        path = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
-                        path += " (x86)";
-#endif
-                        path = System.IO.Path.Combine(path, "Steam");
+#if UNITY_STANDALONE_WIN
+                        path = Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath", "").ToString();
+                        if (string.IsNullOrEmpty(path))
+                        {
+                            Debug.LogError("Could not find steam path in registry");
+                        }
                         return path;
+#else
+                        //TODO MacOS Support
+                        return path;
+#endif
                     }
                 }
 
