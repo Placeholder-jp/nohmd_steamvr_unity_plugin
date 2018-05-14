@@ -2,6 +2,9 @@
 
 namespace Litpla.VR.Util
 {
+    /// <summary>
+    /// SteamVRアプリケーション 仮想HMDドライバ設定
+    /// </summary>
     [Serializable]
     public class default_vrsettings
     {

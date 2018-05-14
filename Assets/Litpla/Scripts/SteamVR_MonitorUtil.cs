@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -14,9 +13,16 @@ namespace Litpla.VR.Util
     /// </summary>
     public static class SteamVR_MonitorUtil
     {
+        /// <summary>
+        /// SteamVRアプリケーションが再起動中
+        /// </summary>
         public static bool IsRestarting { get; private set; }
 
-        private static steamvr_vrsettings ReadSteamVR_VRSettings()
+        /// <summary>
+        /// 一般設定をディスクから読み込み
+        /// </summary>
+        /// <returns></returns>
+        private static steamvr_vrsettings Load_SteamVR_VRSettings()
         {
             var data = new steamvr_vrsettings();
             var path = Emviroment.Path.steamvr_vrsettings;
@@ -28,7 +34,11 @@ namespace Litpla.VR.Util
             return data;
         }
 
-        private static default_vrsettings ReadDefault_VRSettings()
+        /// <summary>
+        /// 仮想ドライバ設定をディスクから読み込み
+        /// </summary>
+        /// <returns></returns>
+        private static default_vrsettings Load_Default_VRSettings()
         {
             var data = new default_vrsettings();
             var path = Emviroment.Path.default_vrsettings;
@@ -40,6 +50,10 @@ namespace Litpla.VR.Util
             return data;
         }
 
+        /// <summary>
+        /// 一般設定をディスクへ書き込み
+        /// </summary>
+        /// <param name="data"></param>
         private static void WriteSteamVR_VRSettings(steamvr_vrsettings data)
         {
             var json = JsonUtility.ToJson(data, true);
@@ -47,6 +61,10 @@ namespace Litpla.VR.Util
             File.WriteAllText(path, json);
         }
 
+        /// <summary>
+        /// 仮想ドライバ設定をディスクへ書き込み
+        /// </summary>
+        /// <param name="data"></param>
         private static void WriteDefault_VRSettings(default_vrsettings data)
         {
             var json = JsonUtility.ToJson(data, true);
@@ -54,12 +72,13 @@ namespace Litpla.VR.Util
             File.WriteAllText(path, json);
         }
 
+        /// <summary>
+        /// 既存のシャペロン設定を削除
+        /// </summary>
         public static void DeleteChaperone_Info()
         {
             if (File.Exists(Emviroment.Path.chaperone_info_vrchap_path))
-            {
                 File.Delete(Emviroment.Path.chaperone_info_vrchap_path);
-            }
         }
 
         /// <summary>
@@ -69,12 +88,12 @@ namespace Litpla.VR.Util
         /// <param name="displayFrequency"></param>
         public static void EnableVirtualDisplayDriver(float displayFrequency = 60f)
         {
-            var s = ReadSteamVR_VRSettings();
+            var s = Load_SteamVR_VRSettings();
             s.steamvr.activateMultipleDrivers = true;
             s.steamvr.forcedDriver = "null";
             WriteSteamVR_VRSettings(s);
 
-            var d = ReadDefault_VRSettings();
+            var d = Load_Default_VRSettings();
             d.driver_null.enable = true;
             d.driver_null.displayFrequency = displayFrequency;
             WriteDefault_VRSettings(d);
@@ -82,14 +101,17 @@ namespace Litpla.VR.Util
             RestartSteamVR();
         }
 
+        /// <summary>
+        /// 仮想HMDドライバを無効化
+        /// </summary>
         public static void DisableVirtualDisplayDriver()
         {
-            var s = ReadSteamVR_VRSettings();
+            var s = Load_SteamVR_VRSettings();
             s.steamvr.activateMultipleDrivers = false;
             s.steamvr.forcedDriver = string.Empty;
             WriteSteamVR_VRSettings(s);
 
-            var d = ReadDefault_VRSettings();
+            var d = Load_Default_VRSettings();
             d.driver_null.enable = false;
             d.driver_null.displayFrequency = 90f;
             WriteDefault_VRSettings(d);
@@ -97,6 +119,10 @@ namespace Litpla.VR.Util
             RestartSteamVR();
         }
 
+        /// <summary>
+        /// SteamVRアプリケーションを再起動
+        /// 一般設定や仮想ドライバを有効にしたあと設定を有効にするには再起動が必要
+        /// </summary>
         public static void RestartSteamVR()
         {
             if (IsRestarting)
@@ -135,6 +161,9 @@ namespace Litpla.VR.Util
 
         private static class Emviroment
         {
+            /// <summary>
+            /// SteamVRアプリケーションに関連するプロセス名
+            /// </summary>
             public static readonly string[] ProcessNames =
             {
                 "vrmonitor",
@@ -146,7 +175,7 @@ namespace Litpla.VR.Util
             {
                 private static string SteamApplicationPath
                 {
-                    get { return string.IsNullOrEmpty(CustomRoot) ? DefaultRoot : CustomRoot; }
+                    get { return DefaultRoot; }
                 }
 
                 private static string DefaultRoot
@@ -155,35 +184,36 @@ namespace Litpla.VR.Util
                     {
                         var path = string.Empty;
 #if UNITY_STANDALONE_WIN
-                        path = Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath", "").ToString();
+                        path = Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath", "")
+                            .ToString();
                         if (string.IsNullOrEmpty(path))
-                        {
                             Debug.LogError("Could not find steam path in registry");
-                        }
                         return path;
-#else
-                        //TODO MacOS Support
+#else //TODO MacOS Support
                         return path;
 #endif
                     }
                 }
 
-                //TODO 外部ファイルから設定できるように
-                private static string CustomRoot
-                {
-                    get { return string.Empty; }
-                }
-
+                /// <summary>
+                /// 一般設定のファイルパス
+                /// </summary>
                 public static string steamvr_vrsettings
                 {
                     get { return System.IO.Path.Combine(SteamApplicationPath, "config/steamvr.vrsettings"); }
                 }
 
+                /// <summary>
+                /// シャペロン設定のファイルパス
+                /// </summary>
                 public static string chaperone_info_vrchap_path
                 {
                     get { return System.IO.Path.Combine(SteamApplicationPath, "config/chaperone_info.vrchap"); }
                 }
 
+                /// <summary>
+                /// 仮想ドライバ設定のファイルパス
+                /// </summary>
                 public static string default_vrsettings
                 {
                     get
@@ -193,6 +223,9 @@ namespace Litpla.VR.Util
                     }
                 }
 
+                /// <summary>
+                /// SteamVRアプリケーション起動用exeのファイルパス
+                /// </summary>
                 public static string vrstartup_exe
                 {
                     get

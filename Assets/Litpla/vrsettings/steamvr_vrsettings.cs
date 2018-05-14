@@ -2,6 +2,9 @@
 
 namespace Litpla.VR.Util
 {
+    /// <summary>
+    /// SteamVRアプリケーション 一般設定
+    /// </summary>
     [Serializable]
     public class steamvr_vrsettings
     {
