@@ -1,6 +1,10 @@
-SteamVR Unity Plugin
+## NoHMD SteamVRPlugin
+[Origin Repo](https://github.com/ValveSoftware/steamvr_unity_plugin)
 
-This is the source code for the plugin found on the Unity Asset Store here:
-http://u3d.as/content/valve-corporation/steam-vr-plugin
+## A. ABOUT
+公式のSteamVRPluginをHMDの接続なしに動作させる改造を施したプラグインです。
+SteamVRのベータ機能である仮想HMDドライバを有効にし、任意のTrackedObjectでシャペロンセットアップを行う機能を提供します。
 
-For Unity 5.4.0f1 and newer 5.X versions  (see other branches for other versions)
+## B. HOW TO USE
+1. SteamVRアプリケーションをSteamからベータを有効にしてからインストールします。(既にインストール済みの場合はベータを有効にしてから再起動)
+2. UnityEditor -> Preferences -> SteamvR Utilから "No Required HMD connection"を有効にします
