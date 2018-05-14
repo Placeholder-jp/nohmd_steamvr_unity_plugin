@@ -17,24 +17,41 @@ namespace Litpla.VR.Util
         {
             EditorGUILayout.BeginVertical();
             EditorGUILayout.Space();
-            #region HMD Requirement
+
             if (Monitor.IsRestarting)
             {
                 EditorGUILayout.HelpBox("Restarting SteamVR...", MessageType.Info);
+                return;
             }
-            else if (EditorApplication.isCompiling)
+
+            if (EditorApplication.isCompiling)
             {
                 EditorGUILayout.HelpBox("Recompiling...", MessageType.Info);
+                return;
             }
-            else
+
+            #region HMD Requirement
+            var title = "No Require HMD connection";
+            var toggle = EditorGUILayout.Toggle(new GUIContent(title), HasNoRequiredHMDDefineSymbol);
+            if (HasNoRequiredHMDDefineSymbol && !toggle)
+                DeactivateNoRequiredHMDSettings();
+            else if (!HasNoRequiredHMDDefineSymbol && toggle)
+                ActivateNoRequiredHMDSettings();
+            EditorGUILayout.HelpBox("HMD及びリンクボックスの接続を必要としない場合はTrueに", MessageType.Info);
+            #endregion
+
+            #region Virtual display frequency
+            EditorGUILayout.Space();
+            if (HasNoRequiredHMDDefineSymbol)
             {
-                var title = "No Require HMD connection";
-                var toggle = EditorGUILayout.Toggle(new GUIContent(title), HasNoRequiredHMDDefineSymbol);
-                if (HasNoRequiredHMDDefineSymbol && !toggle)
-                    DeactivateNoRequiredHMDSettings();
-                else if (!HasNoRequiredHMDDefineSymbol && toggle)
-                    ActivateNoRequiredHMDSettings();
-                EditorGUILayout.HelpBox("HMD及びリンクボックスの接続を必要としない場合はTrueに", MessageType.Info);
+                title = "Virtural HMD frequency";
+                var current = EditorPrefs.GetFloat("SteamVR_Virtual_HMD_Rate", 60f);
+                var field = EditorGUILayout.FloatField(new GUIContent(title), current);
+                if (current != field)
+                {
+                    EditorPrefs.SetFloat("SteamVR_Virtual_HMD_Rate", field);
+                }
+                EditorGUILayout.HelpBox("仮想HMDドライバのディスプレイのリフレッシュレート\n※アプリ実行時のFixedDeltaTimeに影響します", MessageType.Info);
             }
             #endregion
             EditorGUILayout.EndVertical();
