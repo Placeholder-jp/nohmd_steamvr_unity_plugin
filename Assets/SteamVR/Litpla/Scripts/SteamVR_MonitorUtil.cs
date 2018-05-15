@@ -22,7 +22,7 @@ namespace Litpla.VR.Util
         /// 一般設定をディスクから読み込み
         /// </summary>
         /// <returns></returns>
-        private static steamvr_vrsettings Load_SteamVR_VRSettings()
+        private static steamvr_vrsettings Read_SteamVR_VRSettings()
         {
             var data = new steamvr_vrsettings();
             var path = Emviroment.Path.steamvr_vrsettings;
@@ -35,10 +35,10 @@ namespace Litpla.VR.Util
         }
 
         /// <summary>
-        /// 仮想ドライバ設定をディスクから読み込み
+        /// 仮想HMDドライバ設定をディスクから読み込み
         /// </summary>
         /// <returns></returns>
-        private static default_vrsettings Load_Default_VRSettings()
+        private static default_vrsettings Read_Default_VRSettings()
         {
             var data = new default_vrsettings();
             var path = Emviroment.Path.default_vrsettings;
@@ -54,7 +54,7 @@ namespace Litpla.VR.Util
         /// 一般設定をディスクへ書き込み
         /// </summary>
         /// <param name="data"></param>
-        private static void WriteSteamVR_VRSettings(steamvr_vrsettings data)
+        private static void Write_SteamVR_VRSettings(steamvr_vrsettings data)
         {
             var json = JsonUtility.ToJson(data, true);
             var path = Emviroment.Path.steamvr_vrsettings;
@@ -62,10 +62,10 @@ namespace Litpla.VR.Util
         }
 
         /// <summary>
-        /// 仮想ドライバ設定をディスクへ書き込み
+        /// 仮想HMDドライバ設定をディスクへ書き込み
         /// </summary>
         /// <param name="data"></param>
-        private static void WriteDefault_VRSettings(default_vrsettings data)
+        private static void Write_Default_VRSettings(default_vrsettings data)
         {
             var json = JsonUtility.ToJson(data, true);
             var path = Emviroment.Path.default_vrsettings;
@@ -88,15 +88,15 @@ namespace Litpla.VR.Util
         /// <param name="displayFrequency"></param>
         public static void EnableVirtualDisplayDriver(float displayFrequency = 60f)
         {
-            var s = Load_SteamVR_VRSettings();
+            var s = Read_SteamVR_VRSettings();
             s.steamvr.activateMultipleDrivers = true;
             s.steamvr.forcedDriver = "null";
-            WriteSteamVR_VRSettings(s);
+            Write_SteamVR_VRSettings(s);
 
-            var d = Load_Default_VRSettings();
+            var d = Read_Default_VRSettings();
             d.driver_null.enable = true;
             d.driver_null.displayFrequency = displayFrequency;
-            WriteDefault_VRSettings(d);
+            Write_Default_VRSettings(d);
 
             RestartSteamVR();
         }
@@ -106,15 +106,15 @@ namespace Litpla.VR.Util
         /// </summary>
         public static void DisableVirtualDisplayDriver()
         {
-            var s = Load_SteamVR_VRSettings();
+            var s = Read_SteamVR_VRSettings();
             s.steamvr.activateMultipleDrivers = false;
             s.steamvr.forcedDriver = string.Empty;
-            WriteSteamVR_VRSettings(s);
+            Write_SteamVR_VRSettings(s);
 
-            var d = Load_Default_VRSettings();
+            var d = Read_Default_VRSettings();
             d.driver_null.enable = false;
             d.driver_null.displayFrequency = 90f;
-            WriteDefault_VRSettings(d);
+            Write_Default_VRSettings(d);
 
             RestartSteamVR();
         }
@@ -212,7 +212,7 @@ namespace Litpla.VR.Util
                 }
 
                 /// <summary>
-                /// 仮想ドライバ設定のファイルパス
+                /// 仮想HMDドライバ設定のファイルパス
                 /// </summary>
                 public static string default_vrsettings
                 {

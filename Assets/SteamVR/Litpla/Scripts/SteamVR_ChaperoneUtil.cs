@@ -21,6 +21,7 @@ namespace Litpla.VR.Util
 
         /// <summary>
         /// 与えられたTrackedObjectの位置・回転を基準に立位のルームセットアップを行います
+        /// Zの回転値(表裏)は無視されます
         /// </summary>
         /// <param name="trackedObj"></param>
         public static void SetWorkingStandingZeroPoseFrom(SteamVR_TrackedObject trackedObj)

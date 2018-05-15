@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class TestCalibration : MonoBehaviour
 {
-    [SerializeField] private KeyCode _key;
+    [SerializeField] private KeyCode _key = KeyCode.C;
     [SerializeField] private SteamVR_TrackedObject _trackedObj;
 
     private void Update()
