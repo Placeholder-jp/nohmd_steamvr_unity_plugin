@@ -62,7 +62,9 @@ namespace HTC.UnityPlugin.Vive.BindingInterface
         {
             SteamVR_ChaperoneUtil.Reset();
 
-            yield return null;
+            //FIXME 固定時間ではなく、シャペロンの再読込が終わるまで待つ必要がある
+            yield return new WaitForSecondsRealtime(0.5f);
+
             var pos = VRModule.GetCurrentDeviceState(m_deviceIndex).position;
             var rot = VRModule.GetCurrentDeviceState(m_deviceIndex).rotation;
             SteamVR_ChaperoneUtil.SetWorkingStandingZeroPoseFrom(pos, rot);
