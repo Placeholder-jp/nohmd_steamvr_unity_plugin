@@ -16,10 +16,9 @@ namespace Litpla.VR.Util
         private static float calibratedFloorPosition;
         private static readonly float heightOffset = 0f;
         private static readonly bool heightOffsetInInchesNotCentimeters = false;
-        public static bool IsReloading;
 
         /// <summary>
-        /// 与えられた座標・回転値をワールドスペースの原点に設定します
+        /// 与えられた座標・回転値を基準に立位のルームセットアップを行う
         /// </summary>
         /// <param name="position"></param>
         /// <param name="rotation"></param>
@@ -29,6 +28,9 @@ namespace Litpla.VR.Util
             Calibrate(rigidTrans);
         }
 
+        /// <summary>
+        /// ルーム情報を初期化
+        /// </summary>
         public static void Reset()
         {
             OpenVR.ChaperoneSetup.ReloadFromDisk(EChaperoneConfigFile.Live);
@@ -42,8 +44,8 @@ namespace Litpla.VR.Util
         {
             OpenVR.ChaperoneSetup.ReloadFromDisk(EChaperoneConfigFile.Live);
             calibratedCenterPosition = rigidTransform.pos;
-            calibratedCenterRotation = Quaternion.Euler(rigidTransform.rot.eulerAngles.x, rigidTransform.rot.eulerAngles.y, 0f);
-            calibratedFloorPosition = rigidTransform.pos.y - 0.05f; //vive controller offset
+            calibratedCenterRotation = rigidTransform.rot;
+            calibratedFloorPosition = rigidTransform.pos.y - 0.01f; //vive controller offset
             SaveConfiguration();
         }
 

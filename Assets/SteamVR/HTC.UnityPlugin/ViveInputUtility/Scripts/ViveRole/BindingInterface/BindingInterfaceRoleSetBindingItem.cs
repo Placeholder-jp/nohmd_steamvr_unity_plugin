@@ -2,6 +2,8 @@
 
 using HTC.UnityPlugin.VRModuleManagement;
 using System;
+using System.Collections;
+using Litpla.VR.Util;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -20,6 +22,8 @@ namespace HTC.UnityPlugin.Vive.BindingInterface
         [SerializeField]
         private Image m_heighLight;
 
+        private uint m_deviceIndex;
+
         public string deviceSN { get; set; }
         public bool isHeighLight { get { return m_heighLight.enabled; } set { m_heighLight.enabled = value; } }
         public bool isEditing { get { return m_editButton.interactable; } set { m_editButton.interactable = !value; } }
@@ -32,6 +36,7 @@ namespace HTC.UnityPlugin.Vive.BindingInterface
             var roleValue = roleMap.GetBoundRoleValueByDevice(deviceSN);
             var deviceModel = ViveRoleBindingsHelper.GetDeviceModelHint(deviceSN);
 
+            m_deviceIndex = roleMap.GetMappedDeviceByRoleValue(roleValue);
             m_deviceSN.text = deviceSN;
             m_roleName.text = roleInfo.GetNameByRoleValue(roleValue);
 
@@ -46,6 +51,21 @@ namespace HTC.UnityPlugin.Vive.BindingInterface
         public void OnRemove()
         {
             if (onRemovePress != null) { onRemovePress(deviceSN); }
+        }
+
+        public void OnCalibrate()
+        {
+            StartCoroutine(CalibrateImpl());
+        }
+
+        IEnumerator CalibrateImpl()
+        {
+            SteamVR_ChaperoneUtil.Reset();
+
+            yield return null;
+            var pos = VRModule.GetCurrentDeviceState(m_deviceIndex).position;
+            var rot = VRModule.GetCurrentDeviceState(m_deviceIndex).rotation;
+            SteamVR_ChaperoneUtil.SetWorkingStandingZeroPoseFrom(pos, rot);
         }
     }
 }
