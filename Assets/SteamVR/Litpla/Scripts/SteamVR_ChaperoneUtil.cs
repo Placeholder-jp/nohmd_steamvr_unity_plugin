@@ -1,14 +1,11 @@
-﻿using System.Collections;
-using System.Linq;
-using HTC.UnityPlugin.Vive;
+﻿using System.Linq;
 using UnityEngine;
 using Valve.VR;
-using RigidTransform = SteamVR_Utils.RigidTransform;
 
 namespace Litpla.VR.Util
 {
     /// <summary>
-    /// ランタイムで任意のTrackedObjectを使いルームセットアップを行うためのクラス
+    /// ランタイムで立位のルームセットアップを行うためのクラス
     /// </summary>
     public static class SteamVR_ChaperoneUtil
     {
@@ -16,56 +13,41 @@ namespace Litpla.VR.Util
         private static readonly float InchesToMeters = 0.0254f;
         private static Vector3 calibratedCenterPosition = Vector3.zero;
         private static Quaternion calibratedCenterRotation = Quaternion.identity;
-        private static float calibratedFloorPosition = 0f;
-        private static float heightOffset = 0f;
+        private static float calibratedFloorPosition;
+        private static readonly float heightOffset = 0f;
         private static readonly bool heightOffsetInInchesNotCentimeters = false;
-
-
-        /// <summary>
-        /// 与えられたTrackedObjectの位置・回転を基準に立位のルームセットアップを行います
-        /// Zの回転値(表裏)は無視されます
-        /// </summary>
-        /// <param name="trackedObj"></param>
-        public static void SetWorkingStandingZeroPoseFrom(SteamVR_TrackedObject trackedObj)
-        {
-            if (trackedObj != null)
-            {
-                var deviceIdx = trackedObj.index;
-                var device = SteamVR_Controller.Input((int)deviceIdx);
-                var rigidTrans = new RigidTransform(device.GetPose().mDeviceToAbsoluteTracking);
-                trackedObj.StartCoroutine(CalibrateAfterResetChaperoneInfo(rigidTrans));
-            }
-        }
+        public static bool IsReloading;
 
         /// <summary>
-        /// 与えられたPoseTrackerの位置・回転を基準に立位のルームセットアップを行います
-        /// Zの回転値(表裏)は無視されます
+        /// 与えられた座標・回転値をワールドスペースの原点に設定します
         /// </summary>
-        /// <param name="trackedObj"></param>
-        public static void SetWorkingStandingZeroPoseFrom(VivePoseTracker poseTracker)
+        /// <param name="position"></param>
+        /// <param name="rotation"></param>
+        public static void SetWorkingStandingZeroPoseFrom(Vector3 position, Quaternion rotation)
         {
-            if (poseTracker != null)
-            {
-                var deviceIdx = poseTracker.viveRole.GetDeviceIndex();
-                var device = SteamVR_Controller.Input((int)deviceIdx);
-                var rigidTrans = new RigidTransform(device.GetPose().mDeviceToAbsoluteTracking);
-                poseTracker.StartCoroutine(CalibrateAfterResetChaperoneInfo(rigidTrans));
-            }
+            var rigidTrans = new SteamVR_Utils.RigidTransform(position, rotation);
+            Calibrate(rigidTrans);
         }
 
-        private static IEnumerator CalibrateAfterResetChaperoneInfo(RigidTransform rigidTransform)
+        public static void Reset()
         {
-            SteamVR_MonitorUtil.DeleteChaperone_Info();
             OpenVR.ChaperoneSetup.ReloadFromDisk(EChaperoneConfigFile.Live);
-            yield return null;
+            var rigid = new SteamVR_Utils.RigidTransform(Vector3.zero, Quaternion.identity);
+            var mat = rigid.ToHmdMatrix34();
+            OpenVR.ChaperoneSetup.SetWorkingStandingZeroPoseToRawTrackingPose(ref mat);
+            OpenVR.ChaperoneSetup.CommitWorkingCopy(EChaperoneConfigFile.Live);
+        }
+
+        private static void Calibrate(SteamVR_Utils.RigidTransform rigidTransform)
+        {
+            OpenVR.ChaperoneSetup.ReloadFromDisk(EChaperoneConfigFile.Live);
             calibratedCenterPosition = rigidTransform.pos;
             calibratedCenterRotation = Quaternion.Euler(rigidTransform.rot.eulerAngles.x, rigidTransform.rot.eulerAngles.y, 0f);
-            calibratedFloorPosition = rigidTransform.pos.y - 0.05f;
-            Calibrate(calibratedCenterPosition, calibratedCenterRotation, calibratedFloorPosition);
+            calibratedFloorPosition = rigidTransform.pos.y - 0.05f; //vive controller offset
+            SaveConfiguration();
         }
 
-        private static void Calibrate(Vector3 calibratedCenterPosition, Quaternion calibratedCenterRotation,
-            float calibratedFloorPosition)
+        private static void SaveConfiguration()
         {
             Vector3 zeroPosePosition;
             Quaternion zeroPoseRotation;
@@ -82,7 +64,6 @@ namespace Litpla.VR.Util
             {
                 var rigidTransform = new SteamVR_Utils.RigidTransform(zeroPosePosition, zeroPoseRotation);
                 var hmdMatrix34 = rigidTransform.ToHmdMatrix34();
-
                 chaperoneSetup.SetWorkingStandingZeroPoseToRawTrackingPose(ref hmdMatrix34);
                 var pQuadsBuffer = new HmdQuad_t[hardBoundsPoints.Length];
                 for (var index1 = 0; index1 < pQuadsBuffer.Length; ++index1)
@@ -121,8 +102,6 @@ namespace Litpla.VR.Util
                 }
                 chaperoneSetup.SetWorkingPlayAreaSize(a2 - a1, a4 - a3);
                 chaperoneSetup.CommitWorkingCopy(EChaperoneConfigFile.Live);
-                chaperoneSetup.ReloadFromDisk(EChaperoneConfigFile.Live);
-                Debug.Log("Chaperone setup completed");
             }
         }
 
