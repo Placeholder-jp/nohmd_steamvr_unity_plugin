@@ -1,5 +1,6 @@
 ﻿//========= Copyright 2016-2018, HTC Corporation. All rights reserved. ===========
 
+using Litpla.VR.Util;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -89,6 +90,16 @@ namespace HTC.UnityPlugin.Vive.BindingInterface
             ViveRoleBindingsHelper.SaveBindingConfigToFile(VIUSettings.bindingConfigFilePath);
 
             m_dirtySymble.SetActive(false);
+        }
+
+        public void EnableVirtualDisplayDriver()
+        {
+            SteamVR_MonitorUtil.EnableVirtualDisplayDriver();
+        }
+
+        public void DisableVirtualDisplayDriver()
+        {
+            SteamVR_MonitorUtil.DisableVirtualDisplayDriver();
         }
     }
 }
