@@ -29,6 +29,17 @@ namespace Litpla.VR.Util
         }
 
         /// <summary>
+        /// 与えられたdeviceIndexのトラッカーを基準に立位のルームセットアップを行う
+        /// </summary>
+        /// <param name="tracker"></param>
+        public static void SetWorkingStandingZeroPoseFrom(uint deviceIdx)
+        {
+            var device = SteamVR_Controller.Input((int)deviceIdx);
+            var rigidTrans = new SteamVR_Utils.RigidTransform(device.GetPose().mDeviceToAbsoluteTracking);
+            Calibrate(rigidTrans);
+        }
+
+        /// <summary>
         /// ルーム情報を初期化
         /// </summary>
         public static void Reset()
