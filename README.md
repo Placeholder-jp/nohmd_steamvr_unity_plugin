@@ -3,11 +3,10 @@
 
 ## A. ABOUT
 公式のSteamVRPluginをHMDの接続なしに動作させる改造を施したプラグインです。
-SteamVRのベータ機能である仮想HMDドライバを有効にし、任意のTrackedObjectでルームセットアップを行う機能を提供します。
+SteamVRの仮想HMDドライバ設定を有効にし、ViveControllerのみで立位のルームセットアップを行う機能を提供します。
 
 ## B. HOW TO USE
-1. SteamVRアプリケーションをSteamからベータを有効にしてからインストールします。(既にインストール済みの場合はベータを有効にしてから再起動)  
-![SteamVR](https://i.imgur.com/rmdqS4v.jpg)
+1. SteamVRアプリケーションを通常通りインストールします(ベータを使用するとViveTrackerのPogoPinが使用できない不具合がありました)
 2. UnityEditor -> Preferences -> SteamvR Utilから "No Required HMD connection"を有効にします
 ![UnityPreferences](https://i.imgur.com/1M1dGyW.jpg)
 
